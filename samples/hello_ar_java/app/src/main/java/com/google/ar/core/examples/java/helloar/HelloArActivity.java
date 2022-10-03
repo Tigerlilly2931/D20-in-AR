@@ -406,17 +406,17 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       virtualObjectAlbedoInstantPlacementTexture =
           Texture.createFromAsset(
               render,
-              "models/pawn_albedo_instant_placement.png",
+              "models/D20-highrez-texture.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       Texture virtualObjectPbrTexture =
           Texture.createFromAsset(
               render,
-              "models/pawn_roughness_metallic_ao.png",
+              "models/D20-highrez-texture-metallic-map.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.LINEAR);
 
-      virtualObjectMesh = Mesh.createFromAsset(render, "models/pawn.obj");
+      virtualObjectMesh = Mesh.createFromAsset(render, "models/D20.obj");
       virtualObjectShader =
           Shader.createFromAssets(
                   render,
