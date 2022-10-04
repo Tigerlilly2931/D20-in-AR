@@ -23,6 +23,7 @@ import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -153,7 +154,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   // was not changed.  Do this using the timestamp since we can't compare PointCloud objects.
   private long lastPointCloudTimestamp = 0;
 
-  // Virtual object (ARCore pawn)
+  // Virtual object (D20)
   private Mesh virtualObjectMesh;
   private Shader virtualObjectShader;
   private Texture virtualObjectAlbedoTexture;
@@ -170,7 +171,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private final float[] viewMatrix = new float[16];
   private final float[] projectionMatrix = new float[16];
   private final float[] modelViewMatrix = new float[16]; // view x model
-  private final float[] modelViewProjectionMatrix = new float[16]; // projection x view x model
+  private final float[] modelViewProjectionMatrix = new float[16]; // **vPMatrix! projection x view x model
   private final float[] sphericalHarmonicsCoefficients = new float[9 * 3];
   private final float[] viewInverseMatrix = new float[16];
   private final float[] worldLightDirection = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -445,6 +446,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     virtualSceneFramebuffer.resize(width, height);
   }
 
+  private float[] testingRotationMatrix = new float[16];
+
   @Override
   public void onDrawFrame(SampleRender render) {
     if (session == null) {
@@ -594,6 +597,16 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
       Matrix.multiplyMM(modelViewProjectionMatrix, 0, projectionMatrix, 0, modelViewMatrix, 0);
 
+      //if this doesn't work, uncomment out the above line
+      //this will hopefully rotate the model by a little bit each time *fingers crossed*
+      //float[] testing = new float[16]; //testing = scratch
+      //long testingTime = SystemClock.uptimeMillis() % 4000L;
+      //float testingAngle = 0.090f * ((int) testingTime);
+      //Matrix.setRotateM(testingRotationMatrix, 0, testingAngle, 0, 0, -1.0f);
+
+      //Matrix.multiplyMM(testing, 0, modelViewProjectionMatrix, 0, testingRotationMatrix, 0);
+
+
       // Update shader properties and draw
       virtualObjectShader.setMat4("u_ModelView", modelViewMatrix);
       virtualObjectShader.setMat4("u_ModelViewProjection", modelViewProjectionMatrix);
@@ -607,7 +620,15 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
         virtualObjectShader.setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture);
       }
 
+
+
+
       render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer);
+
+
+
+      //add rotation things in here
+
     }
 
     // Compose the virtual scene with the background.
