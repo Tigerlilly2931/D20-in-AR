@@ -30,6 +30,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -82,6 +83,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
@@ -91,6 +93,7 @@ import java.util.List;
 public class HelloArActivity extends AppCompatActivity implements SampleRender.Renderer {
 
   private static final String TAG = HelloArActivity.class.getSimpleName();
+  private TextView tv;
 
   private static final String SEARCHING_PLANE_MESSAGE = "Searching for surfaces...";
   private static final String WAITING_FOR_TAP_MESSAGE = "Tap on a surface to place an object.";
@@ -127,6 +130,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private TapHelper tapHelper;
   private SampleRender render;
 
+  private int randomNum;
+  private Random rng = new Random();
+
   private PlaneRenderer planeRenderer;
   private BackgroundRenderer backgroundRenderer;
   private Framebuffer virtualSceneFramebuffer;
@@ -155,9 +161,10 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private long lastPointCloudTimestamp = 0;
 
   // Virtual object (D20)
-  private Mesh virtualObjectMesh;
+  public Mesh virtualObjectMesh;
   private Shader virtualObjectShader;
   private Texture virtualObjectAlbedoTexture;
+  private String virtualObjectTextureDir;
   private Texture virtualObjectAlbedoInstantPlacementTexture;
 
   private final List<WrappedAnchor> wrappedAnchors = new ArrayList<>();
@@ -177,13 +184,14 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private final float[] worldLightDirection = {0.0f, 0.0f, 0.0f, 0.0f};
   private final float[] viewLightDirection = new float[4]; // view x world light direction
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     surfaceView = findViewById(R.id.surfaceview);
     displayRotationHelper = new DisplayRotationHelper(/*context=*/ this);
-
+    tv = findViewById(R.id.textView);
     // Set up touch listener.
     tapHelper = new TapHelper(/*context=*/ this);
     surfaceView.setOnTouchListener(tapHelper);
@@ -337,7 +345,106 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     super.onWindowFocusChanged(hasFocus);
     FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus);
   }
+  public void rollDice(View view) {
+    randomNum = rng.nextInt(20) + 1;
+    String texturename = null;
+    //crits.setVisibility(TextView.INVISIBLE);
+    //imageViewDice.setVisibility(ImageView.INVISIBLE);
+    //gifImageView.setVisibility(GifImageView.VISIBLE);
+    //mediaPlayer = MediaPlayer.create(this,R.raw.dicerolling);
+    //mediaPlayer.start();
+    switch (randomNum) {
+      case 1:
+        texturename = getString(R.string.oneup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 2:
+        texturename = getString(R.string.twoup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 3:
+        texturename = getString(R.string.threeup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 4:
+        texturename = getString(R.string.fourup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 5:
+        texturename = getString(R.string.fiveup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 6:
+        texturename = getString(R.string.sixup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 7:
+        texturename = getString(R.string.sevenup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 8:
+        texturename = getString(R.string.eightup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 9:
+        texturename = getString(R.string.nineup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 10:
+        texturename = getString(R.string.tenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 11:
+        texturename = getString(R.string.elevenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 12:
+        texturename = getString(R.string.twelveup);
+        virtualObjectTextureDir = texturename;
+        break;
+      case 13:
+        texturename = getString(R.string.thirteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 14:
+        texturename = getString(R.string.fourteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 15:
+        texturename = getString(R.string.fifteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 16:
+        texturename = getString(R.string.sixteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 17:
+        texturename = getString(R.string.seventeenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 18:
+        texturename = getString(R.string.eighteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 19:
+        texturename = getString(R.string.nineteenup);
+         virtualObjectTextureDir = texturename;
+        break;
+      case 20:
+        texturename = getString(R.string.twentyup);
+         virtualObjectTextureDir = texturename;
+        break;
+    }
 
+    if(texturename.equals(null)){
+      //cause you've failed!
+
+      texturename = getString(R.string.oneup);
+    }
+    tv.setText(texturename);
+
+    //return texturename;
+  }
   @Override
   public void onSurfaceCreated(SampleRender render) {
     // Prepare the rendering objects. This involves reading shaders and 3D model files, so may throw
@@ -397,17 +504,18 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           new Mesh(
               render, Mesh.PrimitiveMode.POINTS, /*indexBuffer=*/ null, pointCloudVertexBuffers);
 
+      virtualObjectTextureDir = getString(R.string.oneup);
       // Virtual object to render (ARCore D20)
       virtualObjectAlbedoTexture =
           Texture.createFromAsset(
               render,
-              "models/D20-highrez-texture.png",
+              virtualObjectTextureDir,
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       virtualObjectAlbedoInstantPlacementTexture =
           Texture.createFromAsset(
               render,
-              "models/D20-highrez-texture.png",
+              virtualObjectTextureDir,
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       Texture virtualObjectPbrTexture =
@@ -439,6 +547,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       messageSnackbarHelper.showError(this, "Failed to read a required asset file: " + e);
     }
   }
+
+
 
   @Override
   public void onSurfaceChanged(SampleRender render, int width, int height) {
@@ -620,12 +730,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
         virtualObjectShader.setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture);
       }
 
-
-
-
+      //rollDice();
       render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer);
-
-
 
       //add rotation things in here
 
@@ -634,6 +740,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     // Compose the virtual scene with the background.
     backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR);
   }
+
+
+
 
   // Handle only one tap per frame, as taps are usually low frequency compared to frame rate.
   private void handleTap(Frame frame, Camera camera) {
@@ -660,8 +769,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
             || (trackable instanceof InstantPlacementPoint)
             || (trackable instanceof DepthPoint)) {
           // Cap the number of objects created. This avoids overloading both the
-          // rendering system and ARCore.
-          if (wrappedAnchors.size() >= 20) {
+          // rendering system and ARCore. Originally 20
+          if (wrappedAnchors.size() >= 5) {
             wrappedAnchors.get(0).getAnchor().detach();
             wrappedAnchors.remove(0);
           }
@@ -679,6 +788,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           break;
         }
       }
+
     }
   }
 
@@ -862,6 +972,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     session.configure(config);
   }
 }
+
 
 /**
  * Associates an Anchor with the trackable it was attached to. This is used to be able to check
