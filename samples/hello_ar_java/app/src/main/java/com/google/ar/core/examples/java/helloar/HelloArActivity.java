@@ -521,7 +521,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
               render, Mesh.PrimitiveMode.POINTS, /*indexBuffer=*/ null, pointCloudVertexBuffers);
 
       setUp3DMesh();
-      virtualObjectMesh = Mesh.createFromAsset(render, "models/D20-Dice-Smol.obj");
+      virtualObjectMesh = Mesh.createFromAsset(render, "models/DiceCorrectRotation.obj");
       Texture virtualObjectPbrTexture =
               Texture.createFromAsset(
                       render,
