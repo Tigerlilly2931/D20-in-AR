@@ -17,6 +17,7 @@
 package com.google.ar.core.examples.java.helloar;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.media.Image;
 import android.opengl.GLES30;
@@ -28,6 +29,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -185,6 +187,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private final float[] viewLightDirection = new float[4]; // view x world light direction
 
 
+  String texturename = null;
+
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -201,8 +206,18 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
     installRequested = false;
 
+    Intent intent = new Intent(this, HelloArActivity.class);
     depthSettings.onCreate(this);
     instantPlacementSettings.onCreate(this);
+    Button rollingButton = findViewById(R.id.buttonroll);
+    rollingButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        startActivity(intent);
+        //rollDice();
+      }
+    });
     ImageButton settingsButton = findViewById(R.id.settings_button);
     settingsButton.setOnClickListener(
         new View.OnClickListener() {
@@ -345,9 +360,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     super.onWindowFocusChanged(hasFocus);
     FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus);
   }
-  public void rollDice(View view) {
+  public void rollDice() {
     randomNum = rng.nextInt(20) + 1;
-    String texturename = null;
+
     //crits.setVisibility(TextView.INVISIBLE);
     //imageViewDice.setVisibility(ImageView.INVISIBLE);
     //gifImageView.setVisibility(GifImageView.VISIBLE);
@@ -441,8 +456,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
       texturename = getString(R.string.oneup);
     }
-    tv.setText(texturename);
+//    tv.setText(texturename);
 
+    //setUp3DMesh();
     //return texturename;
   }
   @Override
@@ -504,50 +520,58 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           new Mesh(
               render, Mesh.PrimitiveMode.POINTS, /*indexBuffer=*/ null, pointCloudVertexBuffers);
 
-      virtualObjectTextureDir = getString(R.string.oneup);
-      // Virtual object to render (ARCore D20)
-      virtualObjectAlbedoTexture =
-          Texture.createFromAsset(
-              render,
-              virtualObjectTextureDir,
-              Texture.WrapMode.CLAMP_TO_EDGE,
-              Texture.ColorFormat.SRGB);
-      virtualObjectAlbedoInstantPlacementTexture =
-          Texture.createFromAsset(
-              render,
-              virtualObjectTextureDir,
-              Texture.WrapMode.CLAMP_TO_EDGE,
-              Texture.ColorFormat.SRGB);
-      Texture virtualObjectPbrTexture =
-          Texture.createFromAsset(
-              render,
-              "models/D20-highrez-texture-metallic-map.png",
-              Texture.WrapMode.CLAMP_TO_EDGE,
-              Texture.ColorFormat.LINEAR);
-
+      setUp3DMesh();
       virtualObjectMesh = Mesh.createFromAsset(render, "models/D20-Dice-Smol.obj");
+      Texture virtualObjectPbrTexture =
+              Texture.createFromAsset(
+                      render,
+                      "models/D20-highrez-texture-metallic-map.png",
+                      Texture.WrapMode.CLAMP_TO_EDGE,
+                      Texture.ColorFormat.LINEAR);
       virtualObjectShader =
-          Shader.createFromAssets(
-                  render,
-                  "shaders/environmental_hdr.vert",
-                  "shaders/environmental_hdr.frag",
-                  /*defines=*/ new HashMap<String, String>() {
-                    {
-                      put(
-                          "NUMBER_OF_MIPMAP_LEVELS",
-                          Integer.toString(cubemapFilter.getNumberOfMipmapLevels()));
-                    }
-                  })
-              .setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture)
-              .setTexture("u_RoughnessMetallicAmbientOcclusionTexture", virtualObjectPbrTexture)
-              .setTexture("u_Cubemap", cubemapFilter.getFilteredCubemapTexture())
-              .setTexture("u_DfgTexture", dfgTexture);
+              Shader.createFromAssets(
+                              render,
+                              "shaders/environmental_hdr.vert",
+                              "shaders/environmental_hdr.frag",
+                              /*defines=*/ new HashMap<String, String>() {
+                                {
+                                  put(
+                                          "NUMBER_OF_MIPMAP_LEVELS",
+                                          Integer.toString(cubemapFilter.getNumberOfMipmapLevels()));
+                                }
+                              })
+                      .setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture)
+                      .setTexture("u_RoughnessMetallicAmbientOcclusionTexture", virtualObjectPbrTexture)
+                      .setTexture("u_Cubemap", cubemapFilter.getFilteredCubemapTexture())
+                      .setTexture("u_DfgTexture", dfgTexture);
     } catch (IOException e) {
       Log.e(TAG, "Failed to read a required asset file", e);
       messageSnackbarHelper.showError(this, "Failed to read a required asset file: " + e);
     }
   }
 
+
+  public void setUp3DMesh() throws IOException {
+
+    if(texturename == null){
+      rollDice();
+    }
+    virtualObjectTextureDir = texturename;
+    //virtualObjectTextureDir = texturename;
+    // Virtual object to render (ARCore D20)
+    virtualObjectAlbedoTexture =
+            Texture.createFromAsset(
+                    render,
+                    virtualObjectTextureDir,
+                    Texture.WrapMode.CLAMP_TO_EDGE,
+                    Texture.ColorFormat.SRGB);
+    virtualObjectAlbedoInstantPlacementTexture =
+            Texture.createFromAsset(
+                    render,
+                    virtualObjectTextureDir,
+                    Texture.WrapMode.CLAMP_TO_EDGE,
+                    Texture.ColorFormat.SRGB);
+  }
 
 
   @Override

@@ -50,7 +50,7 @@
       android:text="TextView" />
 
   <Button
-      android:id="@+id/button"
+      android:id="@+id/buttonroll"
       android:layout_width="164dp"
       android:layout_height="70dp"
       android:layout_alignParentBottom="true"
