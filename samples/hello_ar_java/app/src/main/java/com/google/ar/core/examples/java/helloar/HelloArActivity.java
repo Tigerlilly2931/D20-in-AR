@@ -189,6 +189,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
   String texturename = null;
 
+  int randNum;
+
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -206,16 +209,20 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
     installRequested = false;
 
-    Intent intent = new Intent(this, HelloArActivity.class);
+    Intent intent = new Intent(this, RollDiceNotAR.class);
+
+    Intent intentThis = getIntent();
+    randNum = intentThis.getIntExtra("rngNum", 0);
+    virtualObjectTextureDir = getString(R.string.picName, randNum);
+
     depthSettings.onCreate(this);
     instantPlacementSettings.onCreate(this);
     Button rollingButton = findViewById(R.id.buttonroll);
+
     rollingButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-
         startActivity(intent);
-        //rollDice();
       }
     });
     ImageButton settingsButton = findViewById(R.id.settings_button);
@@ -226,6 +233,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
             PopupMenu popup = new PopupMenu(HelloArActivity.this, v);
             popup.setOnMenuItemClickListener(HelloArActivity.this::settingsMenuClick);
             popup.inflate(R.menu.settings_menu);
+            tv.setText(texturename);
             popup.show();
           }
         });
@@ -360,109 +368,12 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     super.onWindowFocusChanged(hasFocus);
     FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus);
   }
-  public void rollDice() {
-    randomNum = rng.nextInt(20) + 1;
 
-    //crits.setVisibility(TextView.INVISIBLE);
-    //imageViewDice.setVisibility(ImageView.INVISIBLE);
-    //gifImageView.setVisibility(GifImageView.VISIBLE);
-    //mediaPlayer = MediaPlayer.create(this,R.raw.dicerolling);
-    //mediaPlayer.start();
-    switch (randomNum) {
-      case 1:
-        texturename = getString(R.string.oneup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 2:
-        texturename = getString(R.string.twoup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 3:
-        texturename = getString(R.string.threeup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 4:
-        texturename = getString(R.string.fourup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 5:
-        texturename = getString(R.string.fiveup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 6:
-        texturename = getString(R.string.sixup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 7:
-        texturename = getString(R.string.sevenup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 8:
-        texturename = getString(R.string.eightup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 9:
-        texturename = getString(R.string.nineup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 10:
-        texturename = getString(R.string.tenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 11:
-        texturename = getString(R.string.elevenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 12:
-        texturename = getString(R.string.twelveup);
-        virtualObjectTextureDir = texturename;
-        break;
-      case 13:
-        texturename = getString(R.string.thirteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 14:
-        texturename = getString(R.string.fourteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 15:
-        texturename = getString(R.string.fifteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 16:
-        texturename = getString(R.string.sixteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 17:
-        texturename = getString(R.string.seventeenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 18:
-        texturename = getString(R.string.eighteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 19:
-        texturename = getString(R.string.nineteenup);
-         virtualObjectTextureDir = texturename;
-        break;
-      case 20:
-        texturename = getString(R.string.twentyup);
-         virtualObjectTextureDir = texturename;
-        break;
-    }
 
-    if(texturename.equals(null)){
-      //cause you've failed!
-
-      texturename = getString(R.string.oneup);
-    }
-//    tv.setText(texturename);
-
-    //setUp3DMesh();
-    //return texturename;
-  }
   @Override
   public void onSurfaceCreated(SampleRender render) {
+
+
     // Prepare the rendering objects. This involves reading shaders and 3D model files, so may throw
     // an IOException.
     try {
@@ -553,10 +464,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
   public void setUp3DMesh() throws IOException {
 
-    if(texturename == null){
-      rollDice();
-    }
-    virtualObjectTextureDir = texturename;
+
     //virtualObjectTextureDir = texturename;
     // Virtual object to render (ARCore D20)
     virtualObjectAlbedoTexture =
@@ -794,7 +702,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
             || (trackable instanceof DepthPoint)) {
           // Cap the number of objects created. This avoids overloading both the
           // rendering system and ARCore. Originally 20
-          if (wrappedAnchors.size() >= 5) {
+          if (wrappedAnchors.size() >= 1) {
             wrappedAnchors.get(0).getAnchor().detach();
             wrappedAnchors.remove(0);
           }
